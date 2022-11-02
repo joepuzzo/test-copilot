@@ -287,3 +287,62 @@ function rotateAroundXAxis(matrix, angle) {
     [0, s, c]
   ]);
 }
+
+// calculate velocity given distance in meters and time in seconds
+// then return the velocity in meters per second
+function calculateVelocity(distance, time) {
+  return distance / time;
+}
+
+// a list of users where each user is an object with a name and age and date of birth
+const users = [
+  { name: 'John', age: 25, dob: '1995-12-17' },
+  { name: 'Jane', age: 35, dob: '1985-11-26' },
+  { name: 'Jim', age: 55, dob: '1965-10-05' },
+];
+
+// sort the users by age in ascending order
+// then log out the users
+users.sort((a, b) => a.age - b.age);
+
+console.log(users);
+
+// given two points in 3D space calculate the linier motion between the two points for a 6 axis robot arm 
+// using the inverse kinematics function
+// the first point is the start point
+// the second point is the end point
+// the number of steps is equal to the number of steps to take between the start and end point and determined by the given step size
+// the output is a list of points between the start and end point
+// each point is a list of 6 angles in radians
+function calculateLinearMotion(startPoint, endPoint, stepSize) {
+  const result = [];
+  const steps = Math.ceil(distanceBetweenPoints(startPoint, endPoint) / stepSize);
+  const stepVector = vectorBetweenPoints(startPoint, endPoint).map(x => x / steps);
+  for (let i = 0; i < steps; i++) {
+    const point = startPoint.map((x, index) => x + stepVector[index] * i);
+    result.push(inverse(point[0], point[1], point[2]));
+  }
+  return result;
+}
+
+// calculate circular motion for a 6 axis robot arm
+// the center point is the center of the circle
+// the radius is the radius of the circle
+// the steps is the number of steps to take around the circle and determined by the given step size
+// the output is a list of points around the circle
+// each point is a list of 6 angles in radians
+function calculateCircularMotion(centerPoint, radius, stepSize) {
+  const result = [];
+  const steps = Math.ceil(2 * Math.PI * radius / stepSize);
+  const stepSizeRadians = 2 * Math.PI / steps;
+  for (let i = 0; i <= steps; i++) {
+    const x = centerPoint[0] + radius * Math.cos(stepSizeRadians * i);
+    const y = centerPoint[1] + radius * Math.sin(stepSizeRadians * i);
+    result.push(inverse(x, y, centerPoint[2]));
+  }
+  return result;
+}
+
+
+
+
