@@ -343,6 +343,42 @@ function calculateCircularMotion(centerPoint, radius, stepSize) {
   return result;
 }
 
+const a1 = 2.5;
+const a2 = 3;
+const a3 = 2.5;
+const a4 = 2.5;
+const a5 = 2.5;
+const a6 = 2;
+
+const DH_TABLE = [    
+  [0,   d90,  a1,       ],
+  [a2,  0,    0,        ],
+  [0,   -d90, 0,        ],
+  [0,   d90,  a3 + a4,  ],
+  [0,   -d90, 0,        ], 
+  [0,   0,    a5+ a6,   ],
+];
+
+// inverse kinematics for a 6DOF robot arm where the input is the desired end effector position, three euler angles, and a denavit hartenberg table
+// the output is a list of 6 angles in radians
+function inverse(x, y, z, roll = 0, pitch = 0, yaw = 0, table = DH_TABLE) {
+  const rotationMatrix = buildRotationMatrix(roll, pitch, yaw);
+  const rotationMatrixZXZ = buildRotationMatrixZXZ(roll, pitch, yaw);
+  const position = [x, y, z];
+  const positionZXZ = matrixDotProduct(rotationMatrixZXZ, position);
+  const theta1 = Math.atan2(positionZXZ[1], positionZXZ[0]);
+  const theta2 = Math.atan2(positionZXZ[2] - table[0][2], Math.sqrt(positionZXZ[0] ** 2 + positionZXZ[1] ** 2) - table[0][0]);
+  const theta3 = Math.atan2(Math.sqrt(positionZXZ[0] ** 2 + positionZXZ[1] ** 2) - table[0][0], positionZXZ[2] - table[0][2]) - Math.atan2(table[1][1], table[1][0]);
+  const theta4 = Math.atan2(rotationMatrixZXZ[2][2], -rotationMatrixZXZ[0][2]);
+  const theta5 = Math.atan2(Math.sqrt(rotationMatrixZXZ[0][2] ** 2 + rotationMatrixZXZ[2][2] ** 2), rotationMatrixZXZ[1][2]);
+  const theta6 = Math.atan2(-rotationMatrixZXZ[1][1], rotationMatrixZXZ[1][0]);
+  return [theta1, theta2, theta3, theta4, theta5, theta6];
+}
+
+// log the inverse of 0, 0, 17.5, 0, 0, 0
+console.log(inverse(0, 0, 15, 0, 0, 0));
 
 
 
+
+  
